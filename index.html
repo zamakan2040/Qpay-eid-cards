@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بطاقة تهنئة العيد (4500×8000)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Cairo', sans-serif;
+      background: #f0f4ff;
+      display: flex; flex-direction: column; align-items: center;
+      color: #003366;
+    }
+    h1 { margin: 20px 0 10px; font-size: 2em; text-align: center; }
+    p { margin: 0 0 20px; font-size: 1em; text-align: center; }
+    .container {
+      width: 100%; max-width: 400px;
+      padding: 0 10px; box-sizing: border-box;
+    }
+    input[type="text"] {
+      width: 100%; padding: 10px; font-size: 1.1em;
+      border: 2px solid #007bff; border-radius: 6px;
+      outline: none; margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%; padding: 12px; font-size: 1.1em;
+      background-color: #007bff; color: white;
+      border: none; border-radius: 6px;
+      cursor: pointer; transition: background-color 0.2s ease;
+    }
+    button:hover { background-color: #0056b3; }
+    button:disabled { background-color: #ccc; cursor: not-allowed; }
+    #loadingText {
+      margin-top: 15px; font-size: 1em; color: #555;
+      display: none; text-align: center;
+    }
+    #cardCanvas {
+      display: none;
+      /* دقة البطاقة الفعلية 4500×8000 */
+      width: 100%; /* للعرض في المتصفح نستخدم 100% مقاس الجوال */
+      max-width: 400px; /* مصغّر للعرض فقط */
+      aspect-ratio: 4500/8000;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    #result img {
+      margin-top: 20px; width: 100%; max-width: 400px;
+      border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    @media (max-width: 480px) {
+      h1 { font-size: 1.5em; }
+      button { font-size: 1em; padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🎉 بطاقتك الخاصة للعيد 🌙</h1>
+    <p>أدخل اسمك وسيتم توليد البطاقة فورًا 👇</p>
+
+    <input type="text" id="nameInput" placeholder="مثال: طارق الجابري" />
+    <button id="generateButton">أنشئ بطاقتي</button>
+    <div id="loadingText">⏳ جاري توليد البطاقة… الرجاء الانتظار قليلاً</div>
+
+    <!-- Canvas بحجم البطاقة الدقيقة (4500×8000) -->
+    <canvas id="cardCanvas" width="4500" height="8000"></canvas>
+
+    <!-- هنا سيظهر الناتج -->
+    <div id="result"></div>
+  </div>
+
+  <script>
+    (function() {
+      // رابط الخلفية بوجهها النسبي داخل نفس المستودع
+      const BACKGROUND_URL = 'eid-bg-4500x8000.png';
+
+      const nameInput   = document.getElementById('nameInput');
+      const generateBtn = document.getElementById('generateButton');
+      const loadingText = document.getElementById('loadingText');
+      const cardCanvas  = document.getElementById('cardCanvas');
+      const resultDiv   = document.getElementById('result');
+      const ctx         = cardCanvas.getContext('2d');
+
+      generateBtn.addEventListener('click', function() {
+        const nameValue = nameInput.value.trim();
+        if (!nameValue) {
+          alert('الرجاء إدخال اسمك أولاً.');
+          return;
+        }
+
+        loadingText.style.display = 'block';
+        generateBtn.disabled = true;
+        resultDiv.innerHTML = '';
+
+        const bgImage = new Image();
+        bgImage.crossOrigin = 'anonymous';
+        bgImage.src = BACKGROUND_URL;
+
+        bgImage.onload = function() {
+          // رسم الخلفية على كامل دقة الكانفاس
+          ctx.clearRect(0, 0, cardCanvas.width, cardCanvas.height);
+          ctx.drawImage(bgImage, 0, 0, cardCanvas.width, cardCanvas.height);
+
+          // ضبط الخط واللون
+          const fontSize = 500; // مناسب للعرض 4500px
+          ctx.font = 'bold ' + fontSize + 'px Cairo, sans-serif';
+          ctx.fillStyle = '#003366';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          // موقع الاسم فوق الخط في الأسفل
+          const x = cardCanvas.width / 2; // 2250
+          const y = 7400;                 // اضبط القيم حسب حاجتك
+
+          ctx.fillText(nameValue, x, y);
+
+          // رسم الخط تحت الاسم
+          const lineWidth = cardCanvas.width * 0.8; // 3600px
+          const lineHeight = 20;
+          const lineX = (cardCanvas.width - lineWidth) / 2; // 450px
+          const lineY = y + fontSize + 50; // 7400 + 500 + 50 = 7950
+
+          ctx.fillStyle = '#003366';
+          ctx.fillRect(lineX, lineY, lineWidth, lineHeight);
+
+          // الحصول على DataURL للصورة PNG
+          const dataURL = cardCanvas.toDataURL('image/png');
+
+          loadingText.style.display = 'none';
+          generateBtn.disabled = false;
+
+          // عرض الصورة مع رابط التحميل
+          resultDiv.innerHTML = `
+            <img src="${dataURL}" alt="بطاقتك" />
+            <br><br>
+            <a href="${dataURL}" download="بطاقة_${nameValue}.png">
+              📥 تحميل البطاقة (4500×8000)
+            </a>
+          `;
+        };
+
+        bgImage.onerror = function() {
+          loadingText.style.display = 'none';
+          generateBtn.disabled = false;
+          alert('تعذّر تحميل خلفية البطاقة. تأكد أن الصورة موجودة في نفس المجلد.');
+        };
+      });
+    })();
+  </script>
+</body>
+</html>
