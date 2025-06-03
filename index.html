@@ -183,7 +183,7 @@
 
     <!-- زر تحميل احترافي -->
     <button id="downloadButton" style="display: none;">
-      ✅ تحميل البطاقة
+      ⬇️ تحميل البطاقة
     </button>
 
     <!-- هنا المعاينة الناتجة -->
@@ -228,7 +228,7 @@
           ctx.drawImage(bgImage, 0, 0, cardCanvas.width, cardCanvas.height);
 
           // ضبط خصائص الخط للكتابة
-          let fontSize = 250;
+          let fontSize = 300;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.font = 'bold ' + fontSize + 'px Cairo, sans-serif';
@@ -242,17 +242,10 @@
 
           // تحديد موقع الكتابة (x, y)
           const x = cardCanvas.width / 2; // وسط العرض
-          const y = 7000;                 // موضع عمودي مضبوط
+          const y = 6900;                 // موضع عمودي مضبوط
 
           ctx.fillText(nameValue, x, y);
 
-          // رسم الخط تحت النص
-          const lineWidth  = cardCanvas.width * 0.8; // 80% من العرض
-          const lineHeight = 20;                     // سمكه 20px
-          const lineX      = (cardCanvas.width - lineWidth) / 2;
-          const lineY      = y + fontSize + 50;      // 50px أسفل النص
-
-          ctx.fillRect(lineX, lineY, lineWidth, lineHeight);
 
           // استخراج الصورة بدقة كاملة
           const dataURL = cardCanvas.toDataURL('image/png');
