@@ -167,8 +167,8 @@
     <input
       type="text"
       id="nameInput"
-      placeholder="مثال: محمد الجابري"
-      maxlength="20"
+      placeholder="مثال: طارق الجابري"
+      maxlength="30"
       oninput="this.value = this.value.slice(0, this.maxLength)"
     />
 
@@ -183,7 +183,7 @@
 
     <!-- زر تحميل احترافي -->
     <button id="downloadButton" style="display: none;">
-      ✅ تحميل البطاقة بدقة عالية
+      ✅ تحميل البطاقة
     </button>
 
     <!-- هنا المعاينة الناتجة -->
@@ -228,7 +228,7 @@
           ctx.drawImage(bgImage, 0, 0, cardCanvas.width, cardCanvas.height);
 
           // ضبط خصائص الخط للكتابة
-          let fontSize = 500;
+          let fontSize = 250;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.font = 'bold ' + fontSize + 'px Cairo, sans-serif';
@@ -242,7 +242,7 @@
 
           // تحديد موقع الكتابة (x, y)
           const x = cardCanvas.width / 2; // وسط العرض
-          const y = 7350;                 // موضع عمودي مضبوط
+          const y = 7000;                 // موضع عمودي مضبوط
 
           ctx.fillText(nameValue, x, y);
 
