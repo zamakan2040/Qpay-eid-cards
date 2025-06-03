@@ -1,89 +1,208 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بطاقة تهنئة العيد (4500×8000)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>بطاقة تهنئة العيد - QPay</title>
   <style>
+    /* ======================= QPay Branding ======================= */
+    /* استخدمنا اللون الأزرق لـ QPay (#009EDB) ولون فاتح لإبراز الواجهة */
+    :root {
+      --qpay-blue: #009EDB;
+      --qpay-dark-blue: #007cb1;
+      --qpay-light-gray: #f4f6f8;
+      --qpay-text: #00304d;
+    }
+
+    /* ======================= استيراد خط Cairo ======================= */
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
+    /* ======================= تهيئة الجسم (body) ======================= */
     body {
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
+      background: var(--qpay-light-gray);
       font-family: 'Cairo', sans-serif;
-      background: #f0f4ff;
-      display: flex; flex-direction: column; align-items: center;
-      color: #003366;
+      color: var(--qpay-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
     }
-    h1 { margin: 20px 0 10px; font-size: 2em; text-align: center; }
-    p { margin: 0 0 20px; font-size: 1em; text-align: center; }
+
+    /* ======================= الحاوية الرئيسية ======================= */
     .container {
-      width: 100%; max-width: 400px;
-      padding: 0 10px; box-sizing: border-box;
-    }
-    input[type="text"] {
-      width: 100%; padding: 10px; font-size: 1.1em;
-      border: 2px solid #007bff; border-radius: 6px;
-      outline: none; margin-bottom: 15px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 420px;
+      margin: 20px;
+      padding: 25px 20px 30px;
       box-sizing: border-box;
+      text-align: center;
     }
-    button {
-      width: 100%; padding: 12px; font-size: 1.1em;
-      background-color: #007bff; color: white;
-      border: none; border-radius: 6px;
-      cursor: pointer; transition: background-color 0.2s ease;
+
+    /* ======================= شعار QPay ======================= */
+    .logo {
+      width: 120px;
+      margin: 0 auto 15px;
     }
-    button:hover { background-color: #0056b3; }
-    button:disabled { background-color: #ccc; cursor: not-allowed; }
+    .logo img {
+      width: 100%;
+      display: block;
+    }
+
+    /* ======================= العنوان والوصف ======================= */
+    h1 {
+      margin: 0 0 10px;
+      font-size: 1.8em;
+      font-weight: bold;
+      color: var(--qpay-text);
+    }
+    p {
+      margin: 0 0 20px;
+      font-size: 1em;
+      color: var(--qpay-text);
+    }
+
+    /* ======================= حقل الإدخال ======================= */
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.1em;
+      border: 2px solid var(--qpay-blue);
+      border-radius: 6px;
+      outline: none;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
+    }
+    input[type="text"]:focus {
+      border-color: var(--qpay-dark-blue);
+      box-shadow: 0 0 5px rgba(0, 158, 219, 0.25);
+    }
+
+    /* ======================= أزرار QPay ======================= */
+    button#generateButton,
+    button#downloadButton {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #ffffff;
+      background-color: var(--qpay-blue);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      margin-bottom: 12px;
+    }
+    button#generateButton:hover,
+    button#downloadButton:hover {
+      background-color: var(--qpay-dark-blue);
+    }
+    button#generateButton:active,
+    button#downloadButton:active {
+      transform: scale(0.98);
+    }
+    button#generateButton:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    /* ======================= رسالة التحميل ======================= */
     #loadingText {
-      margin-top: 15px; font-size: 1em; color: #555;
-      display: none; text-align: center;
-    }
-    #cardCanvas {
+      margin-top: 15px;
+      font-size: 1em;
+      color: var(--qpay-text);
       display: none;
-      /* دقة البطاقة الفعلية 4500×8000 */
-      width: 100%; /* للعرض في المتصفح نستخدم 100% مقاس الجوال */
-      max-width: 400px; /* مصغّر للعرض فقط */
+      text-align: center;
+    }
+
+    /* ======================= Canvas البطاقة ======================= */
+    #cardCanvas {
+      display: none; /* نخفيه لأننا نستخدمه للرسم فقط */
+      width: 100%;
+      max-width: 400px;
       aspect-ratio: 4500/8000;
       border-radius: 6px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin: 20px auto 0;
     }
+
+    /* ======================= المعاينة الناتجة ======================= */
     #result img {
-      margin-top: 20px; width: 100%; max-width: 400px;
-      border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
+
+    /* ======================= استجابة الشاشات الصغيرة ======================= */
     @media (max-width: 480px) {
-      h1 { font-size: 1.5em; }
-      button { font-size: 1em; padding: 10px; }
+      h1 {
+        font-size: 1.5em;
+      }
+      button#generateButton,
+      button#downloadButton {
+        font-size: 1em;
+        padding: 12px;
+      }
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <h1>🎉 بطاقتك الخاصة للعيد 🌙</h1>
-    <p>أدخل اسمك وسيتم توليد البطاقة فورًا 👇</p>
+    <!-- شعار QPay -->
+    <div class="logo">
+      <img src="qpay-logo.png" alt="QPay Logo" />
+    </div>
 
-    <input type="text" id="nameInput" placeholder="مثال: طارق الجابري" />
-    <button id="generateButton">أنشئ بطاقتي</button>
-    <div id="loadingText">⏳ جاري توليد البطاقة… الرجاء الانتظار قليلاً</div>
+    <h1>🎊 عيدك أحلى مع Qpay! 🌙</h1>
+    <p>خلّنا نصمم لك بطاقة معايدة فريدة بإسمك — لأنك جزء من عائلة Qpay 💚👇</p>
 
-    <!-- Canvas بحجم البطاقة الدقيقة (4500×8000) -->
+    <!-- حقل الاسم (محدد طول أقصى) -->
+    <input
+      type="text"
+      id="nameInput"
+      placeholder="مثال: محمد الجابري"
+      maxlength="20"
+      oninput="this.value = this.value.slice(0, this.maxLength)"
+    />
+
+    <!-- زر إنشاء البطاقة -->
+    <button id="generateButton">إنشاء بطاقتي</button>
+
+    <!-- رسالة التحميل -->
+    <div id="loadingText">⏳ جاري توليد البطاقة… من فضلك انتظر</div>
+
+    <!-- Canvas بحجم البطاقة الدقيقة 4500×8000 -->
     <canvas id="cardCanvas" width="4500" height="8000"></canvas>
 
-    <!-- هنا سيظهر الناتج -->
+    <!-- زر تحميل احترافي -->
+    <button id="downloadButton" style="display: none;">
+      ✅ تحميل البطاقة بدقة عالية
+    </button>
+
+    <!-- هنا المعاينة الناتجة -->
     <div id="result"></div>
   </div>
 
   <script>
     (function() {
-      // رابط الخلفية بوجهها النسبي داخل نفس المستودع
+      // رابط الخلفية مع افتراض أنها في نفس المجلد باسم eid-bg-4500x8000.png
       const BACKGROUND_URL = 'eid-bg-4500x8000.png';
 
-      const nameInput   = document.getElementById('nameInput');
-      const generateBtn = document.getElementById('generateButton');
-      const loadingText = document.getElementById('loadingText');
-      const cardCanvas  = document.getElementById('cardCanvas');
-      const resultDiv   = document.getElementById('result');
-      const ctx         = cardCanvas.getContext('2d');
+      // عناصر DOM
+      const nameInput     = document.getElementById('nameInput');
+      const generateBtn   = document.getElementById('generateButton');
+      const loadingText   = document.getElementById('loadingText');
+      const cardCanvas    = document.getElementById('cardCanvas');
+      const downloadBtn   = document.getElementById('downloadButton');
+      const resultDiv     = document.getElementById('result');
+      const ctx           = cardCanvas.getContext('2d');
 
       generateBtn.addEventListener('click', function() {
         const nameValue = nameInput.value.trim();
@@ -92,61 +211,73 @@
           return;
         }
 
+        // إظهار رسالة التحميل وتعطيل زر الإنشاء
         loadingText.style.display = 'block';
         generateBtn.disabled = true;
         resultDiv.innerHTML = '';
+        downloadBtn.style.display = 'none';
 
+        // تحميل صورة الخلفية
         const bgImage = new Image();
         bgImage.crossOrigin = 'anonymous';
         bgImage.src = BACKGROUND_URL;
 
         bgImage.onload = function() {
-          // رسم الخلفية على كامل دقة الكانفاس
+          // رسم الخلفية على كامل حجم الكانفاس
           ctx.clearRect(0, 0, cardCanvas.width, cardCanvas.height);
           ctx.drawImage(bgImage, 0, 0, cardCanvas.width, cardCanvas.height);
 
-          // ضبط الخط واللون
-          const fontSize = 500; // مناسب للعرض 4500px
-          ctx.font = 'bold ' + fontSize + 'px Cairo, sans-serif';
-          ctx.fillStyle = '#003366';
+          // ضبط خصائص الخط للكتابة
+          let fontSize = 500;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
+          ctx.font = 'bold ' + fontSize + 'px Cairo, sans-serif';
 
-          // موقع الاسم فوق الخط في الأسفل
-          const x = cardCanvas.width / 2; // 2250
-          const y = 7400;                 // اضبط القيم حسب حاجتك
+          // تقليص الخط تلقائيًا إذا تجاوز 90% من عرض البطاقة
+          while (ctx.measureText(nameValue).width > cardCanvas.width * 0.9) {
+            fontSize -= 20;
+            ctx.font = 'bold ' + fontSize + 'px Cairo, sans-serif';
+          }
+          ctx.fillStyle = '#003366'; // لون النص
+
+          // تحديد موقع الكتابة (x, y)
+          const x = cardCanvas.width / 2; // وسط العرض
+          const y = 7350;                 // موضع عمودي مضبوط
 
           ctx.fillText(nameValue, x, y);
 
-          // رسم الخط تحت الاسم
-          const lineWidth = cardCanvas.width * 0.8; // 3600px
-          const lineHeight = 20;
-          const lineX = (cardCanvas.width - lineWidth) / 2; // 450px
-          const lineY = y + fontSize + 50; // 7400 + 500 + 50 = 7950
+          // رسم الخط تحت النص
+          const lineWidth  = cardCanvas.width * 0.8; // 80% من العرض
+          const lineHeight = 20;                     // سمكه 20px
+          const lineX      = (cardCanvas.width - lineWidth) / 2;
+          const lineY      = y + fontSize + 50;      // 50px أسفل النص
 
-          ctx.fillStyle = '#003366';
           ctx.fillRect(lineX, lineY, lineWidth, lineHeight);
 
-          // الحصول على DataURL للصورة PNG
+          // استخراج الصورة بدقة كاملة
           const dataURL = cardCanvas.toDataURL('image/png');
 
+          // إخفاء رسالة التحميل وإعادة تمكين زر الإنشاء
           loadingText.style.display = 'none';
           generateBtn.disabled = false;
 
-          // عرض الصورة مع رابط التحميل
-          resultDiv.innerHTML = `
-            <img src="${dataURL}" alt="بطاقتك" />
-            <br><br>
-            <a href="${dataURL}" download="بطاقة_${nameValue}.png">
-              📥 تحميل البطاقة (4500×8000)
-            </a>
-          `;
+          // عرض معاينة البطاقة
+          resultDiv.innerHTML = `<img src="${dataURL}" alt="بطاقتك" />`;
+
+          // إظهار زر التحميل وتفعيله
+          downloadBtn.style.display = 'block';
+          downloadBtn.onclick = function() {
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = 'بطاقة_' + nameValue + '.png';
+            a.click();
+          };
         };
 
         bgImage.onerror = function() {
           loadingText.style.display = 'none';
           generateBtn.disabled = false;
-          alert('تعذّر تحميل خلفية البطاقة. تأكد أن الصورة موجودة في نفس المجلد.');
+          alert('تعذّر تحميل خلفية البطاقة. تأكد من وجود ملف eid-bg-4500x8000.png في نفس المجلد.');
         };
       });
     })();
