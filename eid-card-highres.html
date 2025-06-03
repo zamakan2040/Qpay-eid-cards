@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بطاقة تهنئة العيد (4500×8000)</title>
+  <style>
+    /* ---------------------- استيراد خط Cairo من Google Fonts ---------------------- */
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
+    /* ---------------------- تهيئة جسم الصفحة ---------------------- */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+      background: #f0f4ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #003366;
+    }
+
+    h1 {
+      margin: 20px 0 10px;
+      font-size: 2em;
+      text-align: center;
+    }
+
+    p {
+      margin: 0 0 20px;
+      font-size: 1em;
+      text-align: center;
+    }
+
+    /* ---------------------- الحاوية الرئيسية ---------------------- */
+    .container {
+      width: 100%;
+      max-width: 400px;  /* الحد الأقصى لعرض الصفحة على الشاشات الصغيرة */
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+
+    /* ---------------------- حقل الإدخال والزر ---------------------- */
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 1.1em;
+      border: 2px solid #007bff;
+      border-radius: 6px;
+      outline: none;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.1em;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* ---------------------- رسالة التحميل ---------------------- */
+    #loadingText {
+      margin-top: 15px;
+      font-size: 1em;
+      color: #555;
+      display: none;
+      text-align: center;
+    }
+
+    /* ---------------------- Canvas بحجم البطاقة (4500×8000) ---------------------- */
+    #cardCanvas {
+      display: none; /* نبدأ مخفيًا، ونظهره فقط لو احتجنا رؤية البنية، ولكننا نستخدمه لرسم الصورة */  
+      /* في المتصفح سنُراعي المظهر عبر CSS الناعم، لكن الكانساس نفسه سيكون بدقّة 4500×8000 */
+    }
+
+    /* ---------------------- العنصر الذي يعرض الصورة الناتجة ---------------------- */
+    #result img {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 400px; /* يتناسب مع شاشة الجوال */
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5em;
+      }
+      button {
+        font-size: 1em;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🎉 بطاقتك الخاصة للعيد 🌙</h1>
+    <p>أدخل اسمك وسيتم توليد البطاقة (4500×8000) فورًا 👇</p>
+
+    <input type="text" id="nameInput" placeholder="مثال: طارق الجابري" />
+    <button id="generateButton">أنشئ بطاقتي</button>
+    <div id="loadingText">⏳ جاري توليد البطاقة… الرجاء الانتظار قليلاً</div>
+
+    <!-- Canvas بحجم البطاقة الدقيقة -->
+    <canvas id="cardCanvas" width="4500" height="8000"></canvas>
+
+    <!-- هنا سيظهر الناتج كصورة مصغرة وروابط التحميل -->
+    <div id="result"></div>
+  </div>
+
+  <script>
+    (function() {
+      /**
+       * 1) ضع هنا رابط الخلفيّة المباشر (من GitHub raw أو أي استضافة تدعم CORS)
+       * مثال للرابط: https://raw.githubusercontent.com/username/repo/main/eid-bg-4500x8000.png
+       */
+      const BACKGROUND_URL = 'eid-bg-4500x8000.png';
+
+      const nameInput   = document.getElementById('nameInput');
+      const generateBtn = document.getElementById('generateButton');
+      const loadingText = document.getElementById('loadingText');
+      const cardCanvas  = document.getElementById('cardCanvas');
+      const resultDiv   = document.getElementById('result');
+      const ctx         = cardCanvas.getContext('2d');
+
+      generateBtn.addEventListener('click', function() {
+        const nameValue = nameInput.value.trim();
+        if (!nameValue) {
+          alert('الرجاء إدخال اسمك أولاً.');
+          return;
+        }
+
+        // نظهر رسالة التحميل ونعطل الزر
+        loadingText.style.display = 'block';
+        generateBtn.disabled = true;
+        resultDiv.innerHTML = ''; // نفرّغ أي نتيجة سابقة
+
+        // 2) نقوم بتحميل صورة الخلفية بحجم 4500×8000
+        const bgImage = new Image();
+        bgImage.crossOrigin = 'anonymous'; // لتفادي مشاكل CORS عند رسم الصورة على Canvas
+        bgImage.src = BACKGROUND_URL;
+
+        bgImage.onload = function() {
+          // 3) نرسم الخلفية بكامل دقّة Canvas:
+          ctx.clearRect(0, 0, cardCanvas.width, cardCanvas.height);
+          ctx.drawImage(bgImage, 0, 0, cardCanvas.width, cardCanvas.height);
+
+          // 4) نضبط خصائص الخط للكتابة (500 بكسل هو قياس تقديري لحجم الخط بالنسبة لعرض 4500 بكسل)
+          //    ولكننا نستعمل حجم خط يتناسب مع الدقة الكبيرة؛ جرّب تغيير الرقم إن أردت حجمًا أكبر أو أصغر.
+          const fontSize = 500; // 500px على Canvas 4500×8000
+          ctx.font = 'bold ' + fontSize + 'px Cairo, sans-serif';
+          ctx.fillStyle = '#003366';     // لون النص: الأزرق الداكن (يتناسب مع الخط الأزرق العلوي)
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          // 5) نحسب موقع النص (الاسم) فوق الخط في أسفل التصميم
+          //    - إذا كانت الصورة 8000px ارتفاعًا، والجزء الخاص بالسطر في الأسفل عند y=7600 تقريبًا، 
+          //      فنضع الاسم في y≈7400 (200px فوق الخط). يمكنك تعديل هذه الأرقام لحسب التصميم الفعلي.
+          const x = cardCanvas.width / 2;         // 4500 / 2 = 2250  --> المنتصف أفقيًا
+          const y = 7400;                         // قيمة مبدئية؛ عدّلها حسب حاجتك
+
+          // 6) نرسم الاسم (النص العربي) في المكان المحدد
+          ctx.fillText(nameValue, x, y);
+
+          // 7) نرسم الخط تحت الاسم مباشرة (عرض الخط 80% من عرض البطاقة، سمكه 20px)
+          const lineWidth = cardCanvas.width * 0.8; // مثلاً 3600px
+          const lineHeight = 20;                    // سمك الخط (20px)
+          const lineX = (cardCanvas.width - lineWidth) / 2; // بداية الخط أفقيًا
+          const lineY = y + fontSize + 50;         // نضع الخط 50px أسفل نهاية النص (يكيّفه حسب التجربة)
+
+          // تعطيل تداخل النص مع الخط: استخدم fillRect للرسم
+          ctx.fillStyle = '#003366'; // نفس لون النص أو لون أغمق
+          ctx.fillRect(lineX, lineY, lineWidth, lineHeight);
+
+          // 8) نحصل على DataURL بصيغة PNG كاملة الدقة
+          const dataURL = cardCanvas.toDataURL('image/png');
+
+          // 9) نخفي رسالة التحميل ونفعل الزر مجددًا
+          loadingText.style.display = 'none';
+          generateBtn.disabled = false;
+
+          // 10) نعرض الصورة الناتجة كصورة مصغرة (CSS) مع رابط التحميل
+          resultDiv.innerHTML = `
+            <img src="${dataURL}" alt="بطاقتك" />
+            <br><br>
+            <a href="${dataURL}" download="بطاقة_${nameValue}.png">📥 تحميل البطاقة بدقة عالية (4500×8000)</a>
+          `;
+        };
+
+        bgImage.onerror = function() {
+          loadingText.style.display = 'none';
+          generateBtn.disabled = false;
+          alert('تعذّر تحميل خلفية البطاقة. تأكد أن الرابط المباشر صحيح ويدعم CORS.');
+        };
+      });
+    })();
+  </script>
+</body>
+</html>
